@@ -30,6 +30,9 @@ private fun setInitialValue() = playerRef.set(
 
 ## Moving a character
 
+Moving is restricted to once per second. 
+To be able to move, the field updatedAt needs to be present.
+
 ```kotlin
 
     fun moveLeft() {
