@@ -1,4 +1,4 @@
-# UiB-Hackaton
+# Mini-Hackaton
 
 Simple starting point to interact with Firebase Firestore.
 
