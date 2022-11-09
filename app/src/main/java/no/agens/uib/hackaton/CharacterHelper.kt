@@ -2,7 +2,6 @@ package no.agens.uib.hackaton
 
 import android.util.Log
 import androidx.annotation.DrawableRes
-import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.ktx.firestore
@@ -65,35 +64,24 @@ object CharacterHelper {
     fun setInitialValues() {
         playerRef.get().addOnSuccessListener {
             if (!it.exists()) {
-                setInitialValue()
-                    .addOnFailureListener {
-                        Log.e("uibhackaton", "failed to set initial data", it)
-                    }
+                playerRef.set(
+                    mapOf(
+                        "id" to uuid,
+                        "name" to "vikingman-${(1..30).random()}",
+                        "x" to (0..16).random(),
+                        "y" to (0..16).random(),
+                        "coins" to 0,
+                        "color" to "blue",
+                        "direction" to "left",
+                        "updatedAt" to FieldValue.serverTimestamp()
+                    )
+                ).addOnFailureListener {
+                    Log.e("uibhackaton", "failed to set initial data", it)
+                }
             }
-
         }.addOnFailureListener {
             Log.e("uibhackaton", "Failed to get player data", it)
         }
-    }
-
-    /**
-     * generates a random spawned viking with a generic name
-     * Choses a random sprite based on color enum, Erik/Baelog/Olaf from Lost Vikings
-     */
-    private fun setInitialValue(): Task<Void> {
-        Log.d("uibhackaton", "In set initial values")
-        return playerRef.set(
-            mapOf(
-                "id" to uuid,
-                "name" to "vikingman-${(1..30).random()}",
-                "x" to (0..16).random(),
-                "y" to (0..16).random(),
-                "coins" to 0,
-                "color" to "blue",
-                "direction" to "left",
-                "updatedAt" to FieldValue.serverTimestamp()
-            )
-        )
     }
 
     fun updateName(name: String) =
@@ -102,10 +90,6 @@ object CharacterHelper {
         ).addOnFailureListener {
             Log.e("uibhackaton", "failed to update name", it)
         }
-
-    fun getCurrentPos() {
-
-    }
 
     fun moveTo(x: Int, y: Int) {
         playerRef.update(
