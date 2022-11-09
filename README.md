@@ -33,57 +33,7 @@ private fun setInitialValue() = playerRef.set(
 Moving is restricted to once per second. 
 To be able to move, the field updatedAt needs to be present.
 
-```kotlin
-
-    fun moveLeft() {
-        moveCharacter(playerRef, "x", -1L, "left")
-    }
-
-    fun moveRight() {
-        moveCharacter(playerRef, "x", 1L, "right")
-    }
-
-    fun moveUp() {
-        moveCharacter(playerRef, "y", -1L)
-    }
-
-    fun moveDown() {
-        moveCharacter(playerRef, "y", 1L)
-    }
-
-    private fun moveCharacter(
-        userRef: DocumentReference?,
-        field: String,
-        value: Long,
-        direction: String? = null
-    ) {
-
-        if (direction != null) {
-            userRef?.update(
-                field,
-                FieldValue.increment(value),
-                "updatedAt",
-                FieldValue.serverTimestamp(),
-                "direction",
-                direction
-            )?.addOnFailureListener {
-                Log.e("uibhackaton", "failed to move", it)
-            }
-        } else {
-            userRef?.update(
-                field,
-                FieldValue.increment(value),
-                "updatedAt",
-                FieldValue.serverTimestamp()
-            )
-                ?.addOnFailureListener {
-                    Log.e("uibhackaton", "failed to move", it)
-                }
-        }
-
-    }
-
-```
+To move character, invoke `CharacterHelper::moveCharacter` and provide a `Direction`.
 
 ## Renaming a character
 
