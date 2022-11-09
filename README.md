@@ -1,51 +1,49 @@
-# Mini-Hackaton
+# UiB Hackathon
 
-Simple starting point to interact with Firebase Firestore.
+The goal is to make a way to move your Mango Ipa Viking around and gather as many Mango Ipas as
+possible. 
 
-The sample app already contains the code you need to authenticate anonymously, and initialize a Character in the game.
-It should appear on screen and move in a circle three times.
+During the development phase, you may move around and try out different approaches. When announced,
+the scores will be reset and the competition begins.
 
-# Characterhelper
+Creativity is awarded.
 
-## Creating a character
+This sample app already contains the code you need to authenticate anonymously, and initialize a 
+Character in the game.
 
-All fields needs to be set, otherwise Firestore will reject your request.
+## Getting started
 
-```kotlin 
-private val uuid = FirebaseAuth.getInstance().currentUser!!.uid
-private fun setInitialValue() = playerRef.set(
-        mapOf(
-            "id" to uuid,
-            "name" to "vikingman-${(1..300).random()}", // random generic viking name
-            "x" to (0..16).random(),
-            "y" to (0..16).random(),
-            "coins" to 0,
-            "color" to listOf("blue", "red", "green").random(), // blue/red/green are the only valid colors
-            "direction" to "left",
-            "updatedAt" to FieldValue.serverTimestamp()
-        )
-    )
+Download and install Android Studio: https://developer.android.com/studio
 
-```
+Clone the project: `git clone git@github.com:agensdev/mini-hackaton.git`
 
-## Moving a character
+Open in Android Studio and do a gradle sync (elephant with down left arrow icon)
 
-Moving is restricted to once per second. 
-To be able to move, the field updatedAt needs to be present.
+Connect your device or emulator and press Run.
 
+## Useful files
+
+These files might be relevant to you:
+- `app/build.gradle` - Where you define dependencies
+- `MainActivity` - App entry point
+- `MainScreen` - Where the main screen is put together
+- `CharacterHelper` - Helper methods for moving and changing your character
+- `ui/*` - Directory for defining theme and components
+
+## CharacterHelper
+
+On app startup, you are signed in automatically and given a character. See `setInitialValues`.
+
+Your character stored in the database can be observed with the `CharacterHelper::vikingState` flow.
+ 
 To move character, invoke `CharacterHelper::moveCharacter` and provide a `Direction`.
+Note that movement is restricted to once per second. Also, to be able to move, the field updatedAt 
+needs to be present.
 
-## Renaming a character
+The character can also be renamed using the `CharacterHelper::updateName` method.
 
-```kotlin
+## Useful links
 
-    fun updateName(name: String) =
-        playerRef.update(
-            mapOf("name" to name)
-        ).addOnFailureListener {
-            Log.e("uibhackaton", "failed to update name", it)
-        }
-```
-
-
-
+- Basic Compose layouts: https://developer.android.com/jetpack/compose/layouts/basics
+- Guide to animations in compose: https://developer.android.com/jetpack/compose/animation
+- State in compose: https://developer.android.com/jetpack/compose/state
