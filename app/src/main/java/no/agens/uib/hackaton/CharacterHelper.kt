@@ -1,52 +1,100 @@
 package no.agens.uib.hackaton
 
 import android.util.Log
+import androidx.annotation.DrawableRes
+import com.google.android.gms.tasks.Task
 import com.google.firebase.auth.FirebaseAuth
-import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.ktx.Firebase
+import kotlinx.coroutines.channels.awaitClose
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.callbackFlow
+
+sealed class VikingDirection(
+    @DrawableRes val drawableRes: Int,
+) {
+    object RedRight : VikingDirection(drawableRes = R.drawable.red_viking_right)
+}
+
+data class VikingState(
+    val direction: VikingDirection = VikingDirection.RedRight,
+    val name: String,
+    val coins: Long,
+    val xPos: Long,
+    val yPos: Long,
+)
 
 object CharacterHelper {
 
     private val uuid = FirebaseAuth.getInstance().currentUser!!.uid
     private val playerRef = Firebase.firestore.collection("players").document(uuid)
 
+    val vikingState = playerReferenceFlow()
+
+    init {
+
+    }
+
+    /**
+     * The values for your viking as stored in Firebase
+     */
+    private fun playerReferenceFlow(): Flow<VikingState?> = callbackFlow {
+        val snapshotListener = playerRef.addSnapshotListener { snapshot, error ->
+            val vikingData = if (error == null) {
+                VikingState(
+                    name = snapshot?.getString("name") ?: "",
+                    coins = snapshot?.getLong("coins") ?: 0L,
+                    xPos = snapshot?.getLong("x") ?: 0L,
+                    yPos = snapshot?.getLong("y") ?: 0L,
+                    direction = when (snapshot?.getString("direction")) {
+                        "right" -> VikingDirection.RedRight
+                        else -> VikingDirection.RedRight
+                    }
+                )
+            } else {
+                null
+            }
+            trySend(vikingData)
+        }
+        awaitClose {
+            snapshotListener.remove()
+        }
+    }
 
     fun setInitialValues() {
-
         playerRef.get().addOnSuccessListener {
             if (!it.exists()) {
-                setInitialValue().addOnFailureListener {
-                    Log.e("uibhackaton", "failed to set initial data", it)
-                }
+                setInitialValue()
+                    .addOnFailureListener {
+                        Log.e("uibhackaton", "failed to set initial data", it)
+                    }
             }
 
         }.addOnFailureListener {
-            setInitialValue().addOnFailureListener {
-                Log.e("uibhackaton", "failed to set initial data", it)
-            }
+            Log.e("uibhackaton", "Failed to get player data", it)
         }
-
-
     }
 
     /**
      * generates a random spawned viking with a generic name
      * Choses a random sprite based on color enum, Erik/Baelog/Olaf from Lost Vikings
      */
-    private fun setInitialValue() = playerRef.set(
-        mapOf(
-            "id" to uuid,
-            "name" to "vikingman-${(1..300).random()}",
-            "x" to (0..16).random(),
-            "y" to (0..16).random(),
-            "coins" to 0,
-            "color" to listOf("blue", "red", "green").random(),
-            "direction" to "left",
-            "updatedAt" to FieldValue.serverTimestamp()
+    private fun setInitialValue(): Task<Void> {
+        Log.d("uibhackaton", "In set initial values")
+        return playerRef.set(
+            mapOf(
+                "id" to uuid,
+                "name" to "vikingman-${(1..30).random()}",
+                "x" to (0..16).random(),
+                "y" to (0..16).random(),
+                "coins" to 0,
+                "color" to "blue",
+                "direction" to "left",
+                "updatedAt" to FieldValue.serverTimestamp()
+            )
         )
-    )
+    }
 
     fun updateName(name: String) =
         playerRef.update(
@@ -55,52 +103,38 @@ object CharacterHelper {
             Log.e("uibhackaton", "failed to update name", it)
         }
 
+    fun getCurrentPos() {
 
-    fun moveLeft() {
-        moveCharacter(playerRef, "x", -1L, "left")
     }
 
-    fun moveRight() {
-        moveCharacter(playerRef, "x", 1L, "right")
+    fun moveTo(x: Int, y: Int) {
+        playerRef.update(
+            "x", x,
+            "y", y,
+            "updatedAt",
+            FieldValue.serverTimestamp()
+        )
     }
 
-    fun moveUp() {
-        moveCharacter(playerRef, "y", -1L)
-    }
-
-    fun moveDown() {
-        moveCharacter(playerRef, "y", 1L)
-    }
-
-    private fun moveCharacter(
-        userRef: DocumentReference?,
-        field: String,
-        value: Long,
-        direction: String? = null
-    ) {
-
-        if (direction != null) {
-            userRef?.update(
-                field,
-                FieldValue.increment(value),
-                "updatedAt",
-                FieldValue.serverTimestamp(),
-                "direction",
-                direction
-            )?.addOnFailureListener {
-                Log.e("uibhackaton", "failed to move", it)
-            }
-        } else {
-            userRef?.update(
-                field,
-                FieldValue.increment(value),
-                "updatedAt",
-                FieldValue.serverTimestamp()
-            )
-                ?.addOnFailureListener {
-                    Log.e("uibhackaton", "failed to move", it)
-                }
+    fun moveCharacter(direction: Direction) {
+        val field = when (direction) {
+            Direction.RIGHT, Direction.LEFT -> "x"
+            Direction.UP, Direction.DOWN -> "y"
         }
+        val valueChange = when (direction) {
+            Direction.RIGHT, Direction.DOWN -> 1L
+            Direction.UP, Direction.LEFT -> -1L
+        }
+        playerRef.update(
+            field, FieldValue.increment(valueChange),
+            "updatedAt", FieldValue.serverTimestamp(),
+            "direction", direction.valueAsString
+        ).addOnFailureListener {
+            Log.e("uibhackaton", "failed to move player", it)
+        }
+    }
 
+    enum class Direction(val valueAsString: String) {
+        RIGHT("right"), LEFT("left"), UP("up"), DOWN("down")
     }
 }

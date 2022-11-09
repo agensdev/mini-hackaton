@@ -1,78 +1,73 @@
-@file:OptIn(ExperimentalFoundationApi::class)
-
 package no.agens.uib.hackaton
 
 import android.os.Bundle
-import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.compose.foundation.ExperimentalFoundationApi
+import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.layout.*
-import androidx.compose.material.Button
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Surface
-import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
+import androidx.compose.material.CircularProgressIndicator
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
-import androidx.lifecycle.lifecycleScope
 import com.google.firebase.FirebaseApp
-import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.firestore.ktx.firestore
 import com.google.firebase.firestore.ktx.firestoreSettings
 import com.google.firebase.ktx.Firebase
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
-import no.agens.uib.hackaton.ui.theme.UiBHackatonTheme
 
 
-@OptIn(ExperimentalFoundationApi::class)
 class MainActivity : ComponentActivity() {
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+        initializeFirebase()
 
         // if you don't want to use Compose.
         //setContentView(R.layout.main_activty)
 
+        setContent {
+            val viewModel = remember { MainViewModel() }
+
+            val state by viewModel.getState().collectAsState()
+
+            Crossfade(targetState = state.isSignedIn) { isSignedIn ->
+                if(isSignedIn) {
+                    MainScreen()
+                } else {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        CircularProgressIndicator()
+                    }
+                }
+            }
+        }
+            /*
+
+            Firebase.firestore.collection("beers").whereEqualTo("beer", 3).addSnapshotListener { value, error ->
+
+
+
+
+                value?.documents?.forEach {
+                    val x = it.id.split("x").first()
+                    val y = it.id.split("x").last()
+                    CharacterHelper.moveTo(x.toInt(),y.toInt())
+                    Toast.makeText(this, "tried to move", Toast.LENGTH_SHORT).show()
+
+                }
+            }*/
+
+            // do logic with loggedIn user
+    }
+
+    private fun initializeFirebase() {
         FirebaseApp.initializeApp(this)
         val settings = firestoreSettings {
             isPersistenceEnabled = false
         }
         Firebase.firestore.firestoreSettings = settings
-        FirebaseAuth.getInstance().signInAnonymously().addOnSuccessListener {
-            CharacterHelper.setInitialValues()
-            //CharacterHelper.updateName("some name")
-
-            lifecycleScope.launch {
-                // sample of how to move character, moves the character in a circle three times
-                repeat(3){
-                    CharacterHelper.moveRight()
-                    delay(1500)
-                    CharacterHelper.moveDown()
-                    delay(1500)
-                    CharacterHelper.moveLeft()
-                    delay(1500)
-                    CharacterHelper.moveUp()
-                    delay(1500)
-                }
-
-            }
-            // do logic with loggedIn user
-        }.addOnFailureListener {
-            Toast.makeText(this, "User not signed in", Toast.LENGTH_SHORT).show()
-        }
-
-    }
-
-
-}
-
-@Preview(showBackground = true)
-@Composable
-fun DefaultPreview() {
-    UiBHackatonTheme {
-        Text("hello UiB")
     }
 }
