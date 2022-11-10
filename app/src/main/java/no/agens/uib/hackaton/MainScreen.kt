@@ -59,6 +59,7 @@ fun MainScreen() {
         color = MaterialTheme.colors.background
     ) {
         var showMangoIpaRow by remember { mutableStateOf(false) }
+        val viking by CharacterHelper.vikingState.collectAsState(initial = null)
 
         Box(modifier = Modifier.fillMaxSize()) {
             Column(
@@ -67,7 +68,6 @@ fun MainScreen() {
                     .padding(top = 48.dp),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                val viking by CharacterHelper.vikingState.collectAsState(initial = null)
                 TextTitle(text = viking?.name ?: "No name")
                 Spacer(modifier = Modifier.height(16.dp))
                 val vikingVector = viking?.direction?.drawableRes
