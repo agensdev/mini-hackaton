@@ -3,9 +3,9 @@ package no.agens.uib.hackaton
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.animateContentSize
 import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.animation.core.tween
-import androidx.compose.animation.expandIn
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -16,13 +16,12 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
 import androidx.compose.material.Text
@@ -41,16 +40,7 @@ import coil.compose.AsyncImage
 import no.agens.uib.hackaton.ui.BasicButton
 import no.agens.uib.hackaton.ui.TextBody
 import no.agens.uib.hackaton.ui.TextTitle
-import no.agens.uib.hackaton.ui.theme.UiBHackatonTheme
 
-
-@Preview(showBackground = true)
-@Composable
-fun DefaultPreview() {
-    UiBHackatonTheme {
-        MainScreen()
-    }
-}
 
 @Composable
 fun MainScreen() {
@@ -65,19 +55,24 @@ fun MainScreen() {
             Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(top = 48.dp),
+                    .padding(top = 48.dp)
+                    .animateContentSize(),
                 horizontalAlignment = Alignment.CenterHorizontally,
                 verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
-                TextTitle(text = viking?.name ?: "No name")
-                val vikingColor = when (viking?.color) {
-                    "red" -> "Erik (red)"
-                    "green" -> "Baleog (green)"
-                    "blue" -> "Olaf (blue)"
-                    else -> ""
+                if (viking == null) {
+                    CircularProgressIndicator()
+                } else {
+                    TextTitle(text = viking?.name ?: "No name")
+                    val vikingColor = when (viking?.color) {
+                        "red" -> "Erik (red)"
+                        "green" -> "Baleog (green)"
+                        "blue" -> "Olaf (blue)"
+                        else -> ""
+                    }
+                    TextBody(text = vikingColor)
+                    TextBody(text = "(${viking?.xPos},${viking?.yPos})")
                 }
-                TextBody(text = vikingColor)
-                TextBody(text = "(${viking?.xPos},${viking?.yPos})")
             }
 
 

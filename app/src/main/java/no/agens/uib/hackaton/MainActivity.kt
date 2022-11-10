@@ -27,7 +27,7 @@ class MainActivity : ComponentActivity() {
         //setContentView(R.layout.main_activty)
 
         setContent {
-            val viewModel = remember { MainViewModel() }
+            val viewModel = remember { LoginViewModel() }
             val state by viewModel.getState().collectAsState()
 
             Crossfade(targetState = state.isSignedIn) { isSignedIn ->

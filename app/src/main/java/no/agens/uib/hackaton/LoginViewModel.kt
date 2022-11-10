@@ -12,7 +12,7 @@ data class MainScreenState(
     val isSignedIn: Boolean = false
 )
 
-class MainViewModel : ViewModel() {
+class LoginViewModel : ViewModel() {
 
     private val state = MutableStateFlow(MainScreenState())
 
@@ -27,7 +27,6 @@ class MainViewModel : ViewModel() {
                     it.copy(isSignedIn = true)
                 }
                 CharacterHelper.setInitialValues()
-//                CharacterHelper.updateName("mangokongen")
             }.addOnFailureListener {
                 Log.e("uibhackaton", "Failed to sign in anonymously.", it)
             }

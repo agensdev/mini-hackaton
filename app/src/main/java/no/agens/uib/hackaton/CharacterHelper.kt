@@ -10,14 +10,7 @@ import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 
-sealed class VikingDirection(
-    @DrawableRes val drawableRes: Int,
-) {
-    object RedRight : VikingDirection(drawableRes = R.drawable.red_viking_right)
-}
-
 data class VikingState(
-    val direction: VikingDirection = VikingDirection.RedRight,
     val name: String,
     val color: String,
     val coins: Long,
@@ -44,10 +37,6 @@ object CharacterHelper {
                     color = snapshot?.getString("color") ?: "",
                     xPos = snapshot?.getLong("x") ?: 0L,
                     yPos = snapshot?.getLong("y") ?: 0L,
-                    direction = when (snapshot?.getString("direction")) {
-                        "right" -> VikingDirection.RedRight
-                        else -> VikingDirection.RedRight
-                    }
                 )
             } else {
                 null
