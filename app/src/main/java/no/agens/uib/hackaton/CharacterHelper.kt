@@ -109,11 +109,24 @@ object CharacterHelper {
             Direction.RIGHT, Direction.DOWN -> 1L
             Direction.UP, Direction.LEFT -> -1L
         }
-        playerRef.update(
-            field, FieldValue.increment(valueChange),
-            "updatedAt", FieldValue.serverTimestamp(),
-            "direction", direction.valueAsString
-        ).addOnFailureListener {
+        val task = when (direction) {
+            Direction.UP,
+            Direction.DOWN -> {
+                playerRef.update(
+                    field, FieldValue.increment(valueChange),
+                    "updatedAt", FieldValue.serverTimestamp(),
+                )
+            }
+            Direction.RIGHT,
+            Direction.LEFT -> {
+                playerRef.update(
+                    field, FieldValue.increment(valueChange),
+                    "updatedAt", FieldValue.serverTimestamp(),
+                    "direction", direction.valueAsString // Only set direction for left/right movement
+                )
+            }
+        }
+        task.addOnFailureListener {
             Log.e("uibhackaton", "failed to move player", it)
         }
     }
