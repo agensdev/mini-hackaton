@@ -1,5 +1,9 @@
 # UiB Hackathon
 
+<p align="center">
+  <img src="repo_url_qr.png" />
+</p>
+
 The goal is to make a way to move your Mango Ipa Viking around and gather as many Mango Ipas as
 possible. 
 
