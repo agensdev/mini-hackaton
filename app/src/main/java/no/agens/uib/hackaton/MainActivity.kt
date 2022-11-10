@@ -28,7 +28,6 @@ class MainActivity : ComponentActivity() {
 
         setContent {
             val viewModel = remember { MainViewModel() }
-
             val state by viewModel.getState().collectAsState()
 
             Crossfade(targetState = state.isSignedIn) { isSignedIn ->
@@ -44,23 +43,6 @@ class MainActivity : ComponentActivity() {
                 }
             }
         }
-            /*
-
-            Firebase.firestore.collection("beers").whereEqualTo("beer", 3).addSnapshotListener { value, error ->
-
-
-
-
-                value?.documents?.forEach {
-                    val x = it.id.split("x").first()
-                    val y = it.id.split("x").last()
-                    CharacterHelper.moveTo(x.toInt(),y.toInt())
-                    Toast.makeText(this, "tried to move", Toast.LENGTH_SHORT).show()
-
-                }
-            }*/
-
-            // do logic with loggedIn user
     }
 
     private fun initializeFirebase() {

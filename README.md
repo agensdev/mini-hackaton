@@ -21,6 +21,8 @@ Open in Android Studio and do a gradle sync (elephant with down left arrow icon)
 
 Connect your device or emulator and press Run.
 
+Open `MainScreen.kt` and find the todo: `// TODO: Make your UI here!`. That's where to begin!
+
 ## Useful files
 
 These files might be relevant to you:

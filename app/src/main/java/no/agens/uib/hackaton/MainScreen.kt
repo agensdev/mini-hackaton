@@ -1,5 +1,17 @@
 package no.agens.uib.hackaton
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.Crossfade
+import androidx.compose.animation.animateColorAsState
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.expandIn
+import androidx.compose.animation.expandVertically
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.shrinkVertically
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -9,18 +21,23 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import no.agens.uib.hackaton.CharacterHelper.Direction
-import no.agens.uib.hackaton.CharacterHelper.moveCharacter
+import coil.compose.AsyncImage
 import no.agens.uib.hackaton.ui.BasicButton
 import no.agens.uib.hackaton.ui.TextBody
 import no.agens.uib.hackaton.ui.TextTitle
@@ -41,6 +58,8 @@ fun MainScreen() {
         modifier = Modifier.fillMaxSize(),
         color = MaterialTheme.colors.background
     ) {
+        var showMangoIpaRow by remember { mutableStateOf(false) }
+
         Box(modifier = Modifier.fillMaxSize()) {
             Column(
                 modifier = Modifier
@@ -49,16 +68,19 @@ fun MainScreen() {
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
                 val viking by CharacterHelper.vikingState.collectAsState(initial = null)
-
                 TextTitle(text = viking?.name ?: "No name")
                 Spacer(modifier = Modifier.height(16.dp))
                 val vikingVector = viking?.direction?.drawableRes
-                if (vikingVector != null) {
-                    GifImage(drawableRes = vikingVector)
-                }
+                AsyncImage(
+                    modifier = Modifier.size(24.dp),
+                    model = vikingVector ?: R.drawable.mango_ipa,
+                    contentDescription = null,
+                )
                 Spacer(modifier = Modifier.height(16.dp))
                 TextBody(text = "(${viking?.xPos},${viking?.yPos})")
             }
+
+
 
             Column(
                 modifier = Modifier
@@ -67,30 +89,76 @@ fun MainScreen() {
                 verticalArrangement = Arrangement.Center,
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
+                // Sample button (can be removed):
                 BasicButton(
-                    onClick = { moveCharacter(direction = Direction.UP) },
-                    text = "UP"
+                    text = "This is a button",
+                    onClick = {
+                        // This is run on click.
+                        showMangoIpaRow = !showMangoIpaRow
+                    }
                 )
-                Row(
-                    modifier = Modifier.fillMaxWidth(),
-                    horizontalArrangement = Arrangement.Center
-                ) {
-                    BasicButton(
-                        onClick = { moveCharacter(direction = Direction.LEFT) },
-                        text = "LEFT"
-                    )
+                // TODO: Make your UI here!
+            }
 
-                    Spacer(Modifier.width(42.dp))
 
-                    BasicButton(
-                        onClick = { moveCharacter(direction = Direction.RIGHT) },
-                        text = "RIGHT"
-                    )
+
+            AnimatedVisibility(
+                modifier = Modifier
+                    .align(Alignment.BottomCenter)
+                    .padding(bottom = 32.dp),
+                visible = showMangoIpaRow,
+                enter = fadeIn() + expandVertically(expandFrom = Alignment.Bottom),
+                exit = fadeOut() + shrinkVertically(shrinkTowards = Alignment.Bottom)
+            ) {
+                MangoIpaRow()
+            }
+        }
+    }
+}
+
+@Composable
+fun MangoIpaRow(
+    modifier: Modifier = Modifier,
+) {
+    Row(
+        modifier = modifier,
+        horizontalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        repeat(5) {
+            AsyncImage(
+                model = R.drawable.mango_ipa,
+                contentDescription = null,
+            )
+        }
+    }
+}
+
+@Preview
+@Composable
+fun AnimationsDemo() {
+    MaterialTheme {
+        var isEnabled by remember { mutableStateOf(false) }
+        val backgroundColor by animateColorAsState(if (isEnabled) Color.Green else Color.Red)
+        val cornerRadius by animateDpAsState(if (isEnabled) 4.dp else 32.dp)
+
+        Box(
+            contentAlignment = Alignment.Center,
+            modifier = Modifier
+                .padding(all = 24.dp)
+                .background(
+                    color = backgroundColor,
+                    shape = RoundedCornerShape(cornerRadius)
+                )
+                .clickable {
+                    isEnabled = !isEnabled
                 }
-                BasicButton(
-                    onClick = { moveCharacter(direction = Direction.DOWN) },
-                    text = "DOWN"
-                )
+                .size(64.dp)
+        ) {
+            Crossfade(
+                targetState = isEnabled,
+                animationSpec = tween(500)
+            ) { isOn ->
+                Text(text = if (isOn) "På" else "Av")
             }
         }
     }
