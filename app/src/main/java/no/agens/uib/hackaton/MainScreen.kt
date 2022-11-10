@@ -66,17 +66,17 @@ fun MainScreen() {
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(top = 48.dp),
-                horizontalAlignment = Alignment.CenterHorizontally
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(16.dp)
             ) {
                 TextTitle(text = viking?.name ?: "No name")
-                Spacer(modifier = Modifier.height(16.dp))
-                val vikingVector = viking?.direction?.drawableRes
-                AsyncImage(
-                    modifier = Modifier.size(24.dp),
-                    model = vikingVector ?: R.drawable.mango_ipa,
-                    contentDescription = null,
-                )
-                Spacer(modifier = Modifier.height(16.dp))
+                val vikingColor = when (viking?.color) {
+                    "red" -> "Erik (red)"
+                    "green" -> "Baleog (green)"
+                    "blue" -> "Olaf (blue)"
+                    else -> ""
+                }
+                TextBody(text = vikingColor)
                 TextBody(text = "(${viking?.xPos},${viking?.yPos})")
             }
 

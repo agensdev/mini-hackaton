@@ -19,6 +19,7 @@ sealed class VikingDirection(
 data class VikingState(
     val direction: VikingDirection = VikingDirection.RedRight,
     val name: String,
+    val color: String,
     val coins: Long,
     val xPos: Long,
     val yPos: Long,
@@ -31,10 +32,6 @@ object CharacterHelper {
 
     val vikingState = playerReferenceFlow()
 
-    init {
-
-    }
-
     /**
      * The values for your viking as stored in Firebase
      */
@@ -44,6 +41,7 @@ object CharacterHelper {
                 VikingState(
                     name = snapshot?.getString("name") ?: "",
                     coins = snapshot?.getLong("coins") ?: 0L,
+                    color = snapshot?.getString("color") ?: "",
                     xPos = snapshot?.getLong("x") ?: 0L,
                     yPos = snapshot?.getLong("y") ?: 0L,
                     direction = when (snapshot?.getString("direction")) {
@@ -71,7 +69,7 @@ object CharacterHelper {
                         "x" to (0..16).random(),
                         "y" to (0..16).random(),
                         "coins" to 0,
-                        "color" to "blue",
+                        "color" to listOf("blue", "green", "red").random(),
                         "direction" to "left",
                         "updatedAt" to FieldValue.serverTimestamp()
                     )
