@@ -1,0 +1,40 @@
+{
+  "project_info": {
+    "project_number": "729182960994",
+    "firebase_url": "https://uib-fungame-hackaton-default-rtdb.europe-west1.firebasedatabase.app",
+    "project_id": "uib-fungame-hackaton",
+    "storage_bucket": "uib-fungame-hackaton.appspot.com"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:729182960994:android:e61d1141bedfe7cc51003b",
+        "android_client_info": {
+          "package_name": "no.agens.uib.hackaton"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "729182960994-58n8q3fhp0eklljqagi3c3nholh76ecf.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBWmQgyhRacueS48HogWXxtFrahjoemte4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "729182960994-58n8q3fhp0eklljqagi3c3nholh76ecf.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
