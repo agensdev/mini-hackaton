@@ -95,7 +95,7 @@ object CharacterHelper {
                         "x" to (0..16).random(),
                         "y" to (0..16).random(),
                         "coins" to 0,
-                        "color" to "blue",
+                        "color" to listOf("red", "blue", "green").random(),
                         "direction" to "left",
                         "updatedAt" to FieldValue.serverTimestamp()
                     )
